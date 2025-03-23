@@ -4,7 +4,12 @@ import fs from "fs/promises"
 // Mock fs/promises
 jest.mock("fs/promises")
 const mockedFs = jest.mocked(fs)
-
+jest.mock("../../../../utils/fs", () => {
+	return {
+		fileExistsAtPath: jest.fn().mockReturnValue(true),
+		isDirectory: jest.fn().mockReturnValue(false),
+	}
+})
 describe("loadRuleFiles", () => {
 	beforeEach(() => {
 		jest.clearAllMocks()
@@ -15,9 +20,9 @@ describe("loadRuleFiles", () => {
 		const result = await loadRuleFiles("/fake/path")
 		expect(mockedFs.readFile).toHaveBeenCalled()
 		expect(result).toBe(
-			"\n# Rules from .clinerules:\ncontent with spaces\n" +
-				"\n# Rules from .cursorrules:\ncontent with spaces\n" +
-				"\n# Rules from .windsurfrules:\ncontent with spaces\n",
+			"\n# .clinerules\n\nThe following is provided by a root-level .clinerules file where the user has specified instructions for this working directory (/fake/path)\n\ncontent with spaces\n" +
+				"\n# .cursorrules\n\nThe following is provided by a root-level .cursorrules file where the user has specified instructions for this working directory (/fake/path)\n\ncontent with spaces\n" +
+				"\n# .windsurfrules\n\nThe following is provided by a root-level .windsurfrules file where the user has specified instructions for this working directory (/fake/path)\n\ncontent with spaces\n",
 		)
 	})
 
@@ -62,8 +67,8 @@ describe("loadRuleFiles", () => {
 
 		const result = await loadRuleFiles("/fake/path")
 		expect(result).toBe(
-			"\n# Rules from .clinerules:\ncline rules content\n" +
-				"\n# Rules from .cursorrules:\ncursor rules content\n",
+			"\n# .clinerules\n\nThe following is provided by a root-level .clinerules file where the user has specified instructions for this working directory (/fake/path)\n\ncline rules content\n" +
+				"\n# .cursorrules\n\nThe following is provided by a root-level .cursorrules file where the user has specified instructions for this working directory (/fake/path)\n\ncursor rules content\n",
 		)
 	})
 
@@ -96,7 +101,9 @@ describe("loadRuleFiles", () => {
 		}) as any)
 
 		const result = await loadRuleFiles("/fake/path")
-		expect(result).toBe("\n# Rules from .cursorrules:\ncursor rules content\n")
+		expect(result).toBe(
+			"\n# .cursorrules\n\nThe following is provided by a root-level .cursorrules file where the user has specified instructions for this working directory (/fake/path)\n\ncursor rules content\n",
+		)
 	})
 })
 
@@ -121,7 +128,9 @@ describe("addCustomInstructions", () => {
 		expect(result).toContain("(es)") // Check for language code in parentheses
 		expect(result).toContain("Global Instructions:\nglobal instructions")
 		expect(result).toContain("Mode-specific Instructions:\nmode instructions")
-		expect(result).toContain("Rules from .clinerules-test-mode:\nmode specific rules")
+		expect(result).toContain(
+			"# .clinerules-test-mode\n\nThe following is provided by a root-level .clinerules-test-mode file where the user has specified instructions for this working directory (/fake/path)\n\nmode specific rules",
+		)
 	})
 
 	it("should return empty string when no instructions provided", async () => {

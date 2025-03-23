@@ -18,6 +18,7 @@ const mockedFs = fs as jest.Mocked<typeof fs>
 jest.mock("../../../utils/fs", () => ({
 	fileExistsAtPath: jest.fn().mockResolvedValue(true),
 	createDirectoriesForFile: jest.fn().mockResolvedValue([]),
+	isDirectory: jest.fn().mockResolvedValue(true),
 }))
 
 // Create a mock ExtensionContext with relative paths instead of absolute paths

@@ -1,12 +1,40 @@
 import fs from "fs/promises"
 import path from "path"
-import * as vscode from "vscode"
+import { fileExistsAtPath, isDirectory } from "../../../utils/fs"
 import { LANGUAGES } from "../../../shared/language"
 
-async function safeReadFile(filePath: string): Promise<string> {
+async function safeReadFile(file: string, cwd: string): Promise<string> {
+	let clineRulesFileInstructions: string = ""
+	let ruleFileContent: string = ""
+	const filePath = path.join(cwd, file)
 	try {
-		const content = await fs.readFile(filePath, "utf-8")
-		return content.trim()
+		if (await fileExistsAtPath(filePath)) {
+			if (await isDirectory(filePath)) {
+				try {
+					// Read all files in the .clinerules/ directory.
+					const ruleFiles = await fs
+						.readdir(filePath, { withFileTypes: true, recursive: true })
+						.then((files) => files.filter((file) => file.isFile()))
+						.then((files) => files.map((file) => path.resolve(file.parentPath, file.name)))
+					ruleFileContent = await Promise.all(
+						ruleFiles.map(async (file) => {
+							const ruleFilePathRelative = path.resolve(filePath, file)
+							const fileContent = (await fs.readFile(ruleFilePathRelative, "utf8")).trim()
+							return `${ruleFilePathRelative}:\n${fileContent}`
+						}),
+					).then((contents) => contents.join("\n\n"))
+					clineRulesFileInstructions = `# ${file}/\n\nThe following is provided by a root-level ${file}/ directory where the user has specified instructions for this working directory (${cwd})\n\n${ruleFileContent}`
+				} catch {
+					console.error(`Failed to read .clinerules directory at ${filePath}`)
+				}
+			} else {
+				ruleFileContent = (await fs.readFile(filePath, "utf8")).trim()
+				if (ruleFileContent) {
+					clineRulesFileInstructions = `# ${file}\n\nThe following is provided by a root-level ${file} file where the user has specified instructions for this working directory (${cwd})\n\n${ruleFileContent}`
+				}
+			}
+		}
+		return clineRulesFileInstructions
 	} catch (err) {
 		const errorCode = (err as NodeJS.ErrnoException).code
 		if (!errorCode || !["ENOENT", "EISDIR"].includes(errorCode)) {
@@ -19,11 +47,10 @@ async function safeReadFile(filePath: string): Promise<string> {
 export async function loadRuleFiles(cwd: string): Promise<string> {
 	const ruleFiles = [".clinerules", ".cursorrules", ".windsurfrules"]
 	let combinedRules = ""
-
 	for (const file of ruleFiles) {
-		const content = await safeReadFile(path.join(cwd, file))
+		const content = await safeReadFile(file, cwd)
 		if (content) {
-			combinedRules += `\n# Rules from ${file}:\n${content}\n`
+			combinedRules += `\n${content}\n`
 		}
 	}
 
@@ -43,7 +70,7 @@ export async function addCustomInstructions(
 	let modeRuleContent = ""
 	if (mode) {
 		const modeRuleFile = `.clinerules-${mode}`
-		modeRuleContent = await safeReadFile(path.join(cwd, modeRuleFile))
+		modeRuleContent = await safeReadFile(modeRuleFile, cwd)
 	}
 
 	// Add language preference if provided

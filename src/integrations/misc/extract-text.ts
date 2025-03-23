@@ -4,6 +4,7 @@ import pdf from "pdf-parse/lib/pdf-parse"
 import mammoth from "mammoth"
 import fs from "fs/promises"
 import { isBinaryFile } from "isbinaryfile"
+import { getFileSizeInKB } from "../../utils/fs"
 
 export async function extractTextFromFile(filePath: string): Promise<string> {
 	try {
@@ -22,6 +23,10 @@ export async function extractTextFromFile(filePath: string): Promise<string> {
 		default:
 			const isBinary = await isBinaryFile(filePath).catch(() => false)
 			if (!isBinary) {
+				const fileSize = await getFileSizeInKB(filePath)
+				if (fileSize > 300) {
+					throw new Error(`File is too large to read into context.`)
+				}
 				return addLineNumbers(await fs.readFile(filePath, "utf8"))
 			} else {
 				throw new Error(`Cannot read text for file type: ${fileExtension}`)
