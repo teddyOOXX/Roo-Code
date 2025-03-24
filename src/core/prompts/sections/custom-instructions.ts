@@ -15,7 +15,7 @@ async function safeReadFile(file: string, cwd: string): Promise<string> {
 					const ruleFiles = await fs
 						.readdir(filePath, { withFileTypes: true, recursive: true })
 						.then((files) => files.filter((file) => file.isFile()))
-						.then((files) => files.map((file) => path.resolve(file.parentPath, file.name)))
+						.then((files) => files.map((file) => path.resolve(filePath, file.name)))
 					ruleFileContent = await Promise.all(
 						ruleFiles.map(async (file) => {
 							const ruleFilePathRelative = path.resolve(filePath, file)
@@ -23,14 +23,14 @@ async function safeReadFile(file: string, cwd: string): Promise<string> {
 							return `${ruleFilePathRelative}:\n${fileContent}`
 						}),
 					).then((contents) => contents.join("\n\n"))
-					clineRulesFileInstructions = `# ${file}/\n\nThe following is provided by a root-level ${file}/ directory where the user has specified instructions for this working directory (${cwd})\n\n${ruleFileContent}`
+					clineRulesFileInstructions = `# ${file}/\n\nThe following is provided by a root-level ${file}/ directory where the user has specified instructions for this working directory (${path.posix.join(cwd)})\n\n${ruleFileContent}`
 				} catch {
 					console.error(`Failed to read .clinerules directory at ${filePath}`)
 				}
 			} else {
 				ruleFileContent = (await fs.readFile(filePath, "utf8")).trim()
 				if (ruleFileContent) {
-					clineRulesFileInstructions = `# ${file}\n\nThe following is provided by a root-level ${file} file where the user has specified instructions for this working directory (${cwd})\n\n${ruleFileContent}`
+					clineRulesFileInstructions = `# ${file}\n\nThe following is provided by a root-level ${file} file where the user has specified instructions for this working directory (${path.posix.join(cwd)})\n\n${ruleFileContent}`
 				}
 			}
 		}
