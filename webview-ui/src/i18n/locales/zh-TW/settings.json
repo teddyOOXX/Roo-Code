@@ -268,7 +268,8 @@
 		},
 		"maxReadFile": {
 			"label": "檔案讀取自動截斷閾值",
-			"description": "預設讀取檔案的行數"
+			"description": "預設讀取檔案的行數",
+			"lines": "行"
 		}
 	},
 	"terminal": {
@@ -407,11 +408,15 @@
 		"baseUrl": "輸入基礎 URL...",
 		"modelId": {
 			"lmStudio": "範例：meta-llama-3.1-8b-instruct",
+			"lmStudioDraft": "範例：lmstudio-community/llama-3.2-1b-instruct",
 			"ollama": "範例：llama3.1"
 		},
 		"numbers": {
 			"maxTokens": "範例：4096",
-			"contextWindow": "範例：128000"
+			"contextWindow": "範例：128000",
+			"inputPrice": "範例：0.0001",
+			"outputPrice": "範例：0.0002",
+			"cacheWritePrice": "範例：0.00005"
 		}
 	},
 	"defaults": {
