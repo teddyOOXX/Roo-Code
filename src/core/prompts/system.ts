@@ -3,6 +3,7 @@ import os from "os"
 import osName from "os-name"
 import { McpHub } from "../../services/mcp/McpHub"
 import { BrowserSettings } from "../../shared/BrowserSettings"
+import getESLintRules from "./gen-eslint-rules"
 
 export const SYSTEM_PROMPT = async (
 	cwd: string,
@@ -919,7 +920,7 @@ ${
 `
 		: ""
 }
-
+${await getESLintRules()}
 ====
 
 RULES
