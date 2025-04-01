@@ -26,6 +26,7 @@ import {
 } from "./sections"
 import { loadSystemPromptFile } from "./sections/custom-system-prompt"
 import { formatLanguage } from "../../shared/language"
+import getLintRules from "./sections/lint-rules"
 
 async function generatePrompt(
 	context: vscode.ExtensionContext,
@@ -86,7 +87,7 @@ ${getCapabilitiesSection(cwd, supportsComputerUse, mcpHub, effectiveDiffStrategy
 ${modesSection}
 
 ${getRulesSection(cwd, supportsComputerUse, effectiveDiffStrategy, experiments)}
-
+${await getLintRules()}
 ${getSystemInfoSection(cwd, mode, customModeConfigs)}
 
 ${getObjectiveSection()}

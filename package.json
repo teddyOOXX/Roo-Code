@@ -418,6 +418,7 @@
 		"@types/debug": "^4.1.12",
 		"@types/diff": "^5.2.1",
 		"@types/diff-match-patch": "^1.0.36",
+		"@types/eslint": "^8.56.12",
 		"@types/glob": "^8.1.0",
 		"@types/jest": "^29.5.14",
 		"@types/node": "20.x",
