@@ -8,6 +8,7 @@ import "../../../utils/path" // Import path utils to get access to toPosix strin
 import { addCustomInstructions } from "../sections/custom-instructions"
 import { EXPERIMENT_IDS } from "../../../shared/experiments"
 import { MultiSearchReplaceDiffStrategy } from "../../diff/strategies/multi-search-replace"
+import { getWorkspacePath } from "../../../utils/path"
 
 // Mock the sections
 jest.mock("../sections/modes", () => ({
@@ -736,7 +737,7 @@ describe("addCustomInstructions", () => {
 
 	it("should exclude MCP server creation info when disabled", async () => {
 		const mockMcpHub = createMockMcpHub()
-
+		;(getWorkspacePath as jest.Mock).mockReturnValue("/mock/workspace")
 		const prompt = await SYSTEM_PROMPT(
 			mockContext,
 			"/test/path",
