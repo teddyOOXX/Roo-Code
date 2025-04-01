@@ -31,7 +31,7 @@ export interface LinterReport {
 export function runCommand(command: string, options: string[], projectFolder: string) {
 	return new Promise<string>((resolve, reject) => {
 		const child = spawn(command, options, {
-			cwd: projectFolder, // 设置子进程的工作目录
+			cwd: projectFolder, // Set the working directory of the subprocess
 			stdio: ["ignore", "pipe", "pipe"],
 		})
 
@@ -39,11 +39,6 @@ export function runCommand(command: string, options: string[], projectFolder: st
 
 		child.stdout?.on("data", (data) => {
 			output += data.toString()
-		})
-
-		child.stderr?.on("data", (data) => {
-			console.log(data.toString())
-			// reject(data);
 		})
 
 		child.on("close", (code) => {
