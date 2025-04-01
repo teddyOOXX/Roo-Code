@@ -10,6 +10,7 @@ import { EXPERIMENT_IDS } from "../../../shared/experiments"
 import { MultiSearchReplaceDiffStrategy } from "../../diff/strategies/multi-search-replace"
 import { getWorkspacePath } from "../../../utils/path"
 
+jest.mock("../../../utils/path")
 // Mock the sections
 jest.mock("../sections/modes", () => ({
 	getModesSection: jest.fn().mockImplementation(async () => `====\n\nMODES\n\n- Test modes section`),
@@ -153,7 +154,7 @@ describe("SYSTEM_PROMPT", () => {
 		// Ensure fs mock is properly initialized
 		const mockFs = jest.requireMock("fs/promises")
 		mockFs._setInitialMockData()
-
+		;(getWorkspacePath as jest.Mock).mockReturnValue("/mock/workspace")
 		// Initialize all required directories
 		const dirs = [
 			"/mock",
@@ -737,7 +738,7 @@ describe("addCustomInstructions", () => {
 
 	it("should exclude MCP server creation info when disabled", async () => {
 		const mockMcpHub = createMockMcpHub()
-		;(getWorkspacePath as jest.Mock).mockReturnValue("/mock/workspace")
+
 		const prompt = await SYSTEM_PROMPT(
 			mockContext,
 			"/test/path",
