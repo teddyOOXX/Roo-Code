@@ -28,7 +28,7 @@ type ProviderSettings = {
 	glamaModelId?: string | undefined
 	glamaModelInfo?:
 		| ({
-				maxTokens?: number | undefined
+				maxTokens?: (number | null) | undefined
 				contextWindow: number
 				supportsImages?: boolean | undefined
 				supportsComputerUse?: boolean | undefined
@@ -47,7 +47,7 @@ type ProviderSettings = {
 	openRouterModelId?: string | undefined
 	openRouterModelInfo?:
 		| ({
-				maxTokens?: number | undefined
+				maxTokens?: (number | null) | undefined
 				contextWindow: number
 				supportsImages?: boolean | undefined
 				supportsComputerUse?: boolean | undefined
@@ -84,7 +84,7 @@ type ProviderSettings = {
 	openAiModelId?: string | undefined
 	openAiCustomModelInfo?:
 		| ({
-				maxTokens?: number | undefined
+				maxTokens?: (number | null) | undefined
 				contextWindow: number
 				supportsImages?: boolean | undefined
 				supportsComputerUse?: boolean | undefined
@@ -126,7 +126,7 @@ type ProviderSettings = {
 	unboundModelId?: string | undefined
 	unboundModelInfo?:
 		| ({
-				maxTokens?: number | undefined
+				maxTokens?: (number | null) | undefined
 				contextWindow: number
 				supportsImages?: boolean | undefined
 				supportsComputerUse?: boolean | undefined
@@ -144,7 +144,7 @@ type ProviderSettings = {
 	requestyModelId?: string | undefined
 	requestyModelInfo?:
 		| ({
-				maxTokens?: number | undefined
+				maxTokens?: (number | null) | undefined
 				contextWindow: number
 				supportsImages?: boolean | undefined
 				supportsComputerUse?: boolean | undefined
@@ -252,11 +252,10 @@ type GlobalSettings = {
 	fuzzyMatchThreshold?: number | undefined
 	experiments?:
 		| {
-				experimentalDiffStrategy: boolean
 				search_and_replace: boolean
+				experimentalDiffStrategy: boolean
 				insert_content: boolean
 				powerSteering: boolean
-				multi_search_and_replace: boolean
 		  }
 		| undefined
 	language?:
@@ -459,22 +458,10 @@ interface RooCodeAPI extends EventEmitter<RooCodeEvents> {
 	 */
 	getConfiguration(): RooCodeSettings
 	/**
-	 * Returns the value of a configuration key.
-	 * @param key The key of the configuration value to return.
-	 * @returns The value of the configuration key.
-	 */
-	getConfigurationValue<K extends keyof RooCodeSettings>(key: K): RooCodeSettings[K]
-	/**
 	 * Sets the configuration for the current task.
 	 * @param values An object containing key-value pairs to set.
 	 */
 	setConfiguration(values: RooCodeSettings): Promise<void>
-	/**
-	 * Sets the value of a configuration key.
-	 * @param key The key of the configuration value to set.
-	 * @param value The value to set.
-	 */
-	setConfigurationValue<K extends keyof RooCodeSettings>(key: K, value: RooCodeSettings[K]): Promise<void>
 	/**
 	 * Returns true if the API is ready to use.
 	 */
